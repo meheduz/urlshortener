@@ -1,0 +1,20 @@
+services:
+  url-shortener:
+    build: .
+    ports:
+      # Override the host port if 8080 is taken: HOST_PORT=8081 docker compose up
+      - "${HOST_PORT:-8080}:8080"
+    environment:
+      ADDR: ":8080"
+      BASE_URL: "http://localhost:${HOST_PORT:-8080}"
+      DB_PATH: "/app/data/urls.db"
+    volumes:
+      - url-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  url-data:
